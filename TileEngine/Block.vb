@@ -5,6 +5,7 @@ Public Class Block
 
     Public Position As Vector2 = Vector2.Zero
     Public BlockWidth As Integer = 100
+    Public rect As Rectangle
 
     Public Sub Draw(theSpriteBatch As SpriteBatch)
         DrawRectangle.Draw(theSpriteBatch, New Rectangle(CInt(BlockWidth * Position.X), CInt(BlockWidth * Position.Y), BlockWidth, BlockWidth), New Color(160, 160, 180)) ' Top Face
@@ -24,5 +25,6 @@ Public Class Block
 
     Public Sub New(_position As Vector2)
         Position = _position
+        rect = New Rectangle(CInt(Position.X * BlockWidth), CInt(Position.Y * BlockWidth) + BlockWidth, BlockWidth, BlockWidth)
     End Sub
 End Class

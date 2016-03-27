@@ -16,7 +16,9 @@ Public Class TileEngine
     Private spriteBatch As SpriteBatch
     Dim renderTarget As RenderTarget2D
 
-    Public Blocks As New List(Of Block)
+    Public Shared Blocks As New List(Of Block)
+
+    Public Player As New Character
 
     Public Sub New()
         MyBase.New()
@@ -44,6 +46,8 @@ Public Class TileEngine
         Blocks.Add(New Block(New Vector2(3, 2)))
         Blocks.Add(New Block(New Vector2(2, 2)))
 
+
+        Player.rect.Location = New Vector2(500, 300).ToPoint
         MyBase.Initialize()
     End Sub
 
@@ -55,6 +59,7 @@ Public Class TileEngine
         ' Create a new SpriteBatch, which can be used to draw textures.
         spriteBatch = New SpriteBatch(GraphicsDevice)
 
+        Player.SpriteTexture = Content.Load(Of Texture2D)("character")
         ' TODO: use this.Content to load your game content here
     End Sub
 
@@ -76,7 +81,7 @@ Public Class TileEngine
             [Exit]()
         End If
 
-        ' TODO: Add your update logic here
+        Player.Update(gameTime)
 
         MyBase.Update(gameTime)
     End Sub
@@ -95,12 +100,22 @@ Public Class TileEngine
         GraphicsDevice.Clear(Color.CornflowerBlue)
 
 
-        spriteBatch.Draw(renderTarget, New Vector2(0, 0), Color.Black * 0.3F)
-        For Each Block In Blocks
-            Block.Draw(spriteBatch)
+        spriteBatch.Draw(renderTarget, New Vector2(0, 0), Color.Black * 0.3F) ' Draw shadows
+
+
+        For Each Block In Blocks ' Draw blocks behind player
+            If Block.rect.Y <= Player.rect.Y Then
+                Block.Draw(spriteBatch)
+            End If
         Next
 
+        Player.Draw(spriteBatch)
 
+        For Each Block In Blocks ' Draw blocks in front of player
+            If Block.rect.Y > Player.rect.Y Then
+                Block.Draw(spriteBatch)
+            End If
+        Next
         spriteBatch.End()
 
 

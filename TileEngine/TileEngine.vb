@@ -17,6 +17,7 @@ Public Class TileEngine
     Dim renderTarget As RenderTarget2D
 
     Public Shared Blocks As New List(Of Block)
+    Public Shared Tiles As New List(Of Tile)
 
     Public Player As New Character
 
@@ -68,6 +69,10 @@ Public Class TileEngine
           New Rectangle(CInt(0.25 * Block.BlockWidth), CInt(0.7 * Block.BlockWidth), CInt(-0.5 * Block.BlockWidth), CInt(-0.7 * Block.BlockWidth)), True))
 
 
+        Tile.TileWidth = 70
+
+        Tiles.Add(New Tile(New Vector2(0, 2), Content.Load(Of Texture2D)("grass")))
+
 
 
         Player.SpriteTexture = Content.Load(Of Texture2D)("character")
@@ -110,34 +115,44 @@ Public Class TileEngine
         graphics.GraphicsDevice.SetRenderTarget(Nothing)
         GraphicsDevice.Clear(Color.CornflowerBlue)
 
+        ' Draw floor tiles
+        For Each Tile In Tiles
+            Tile.Draw(spriteBatch)
+        Next
 
-        spriteBatch.Draw(renderTarget, New Vector2(0, 0), Color.Black * 0.3F) ' Draw shadows
+
+        ' Draw render target with shadows
+        spriteBatch.Draw(renderTarget, New Vector2(0, 0), Color.Black * 0.3F)
 
 
-        For Each Block In Blocks ' Draw blocks behind player
+        ' Draw blocks behind player
+        For Each Block In Blocks
             If Block.rect.Y + Block.BlockWidth <= Player.rect.Y Then
                 Block.Draw(spriteBatch)
             End If
         Next
 
+        ' Draw player
         Player.Draw(spriteBatch)
 
-        For Each Block In Blocks ' Draw blocks in front of player
+        ' Draw blocks in front of player
+        For Each Block In Blocks
             If Block.rect.Y + Block.BlockWidth > Player.rect.Y Then
                 Block.Draw(spriteBatch)
             End If
         Next
         spriteBatch.End()
 
-
-        graphics.GraphicsDevice.SetRenderTarget(renderTarget)
-        GraphicsDevice.Clear(Color.Transparent)
-        spriteBatch.Begin()
-        For Each Block In Blocks
-            Block.DrawShadow(spriteBatch)
-        Next
-        spriteBatch.End()
-
+        If gameTime.TotalGameTime.TotalSeconds < 5 Then
+            ' Draw shadows which will be saved to a render target
+            graphics.GraphicsDevice.SetRenderTarget(renderTarget)
+            GraphicsDevice.Clear(Color.Transparent)
+            spriteBatch.Begin()
+            For Each Block In Blocks
+                Block.DrawShadow(spriteBatch)
+            Next
+            spriteBatch.End()
+        End If
         MyBase.Draw(gameTime)
     End Sub
 End Class

@@ -38,13 +38,6 @@ Public Class TileEngine
         renderTarget = New RenderTarget2D(GraphicsDevice, GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight)
 
 
-        Blocks.Add(New Block(New Vector2(0, 0)))
-        Blocks.Add(New Block(New Vector2(1, 0)))
-        Blocks.Add(New Block(New Vector2(2, 0)))
-        Blocks.Add(New Block(New Vector2(3, 0)))
-        Blocks.Add(New Block(New Vector2(3, 1)))
-        Blocks.Add(New Block(New Vector2(3, 2)))
-        Blocks.Add(New Block(New Vector2(2, 2)))
 
 
         Player.rect.Location = New Vector2(500, 300).ToPoint
@@ -58,6 +51,17 @@ Public Class TileEngine
     Protected Overrides Sub LoadContent()
         ' Create a new SpriteBatch, which can be used to draw textures.
         spriteBatch = New SpriteBatch(GraphicsDevice)
+
+
+
+        'Blocks.Add(New Block(New Vector2(0, 0)))
+        'Blocks.Add(New Block(New Vector2(1, 0)))
+        'Blocks.Add(New Block(New Vector2(2, 0)))
+        'Blocks.Add(New Block(New Vector2(3, 0)))
+        'Blocks.Add(New Block(New Vector2(3, 1)))
+        'Blocks.Add(New Block(New Vector2(3, 2)))
+        Blocks.Add(New Block(New Vector2(2, 2), True, Content.Load(Of Texture2D)("tree"), New Rectangle(25, 70, -50, -70)))
+
 
         Player.SpriteTexture = Content.Load(Of Texture2D)("character")
         ' TODO: use this.Content to load your game content here
@@ -104,7 +108,7 @@ Public Class TileEngine
 
 
         For Each Block In Blocks ' Draw blocks behind player
-            If Block.rect.Y <= Player.rect.Y Then
+            If Block.rect.Y + Block.BlockWidth <= Player.rect.Y Then
                 Block.Draw(spriteBatch)
             End If
         Next
@@ -112,7 +116,7 @@ Public Class TileEngine
         Player.Draw(spriteBatch)
 
         For Each Block In Blocks ' Draw blocks in front of player
-            If Block.rect.Y > Player.rect.Y Then
+            If Block.rect.Y + Block.BlockWidth > Player.rect.Y Then
                 Block.Draw(spriteBatch)
             End If
         Next

@@ -6,21 +6,20 @@ Public Class Character
     Public rect As New Rectangle(0, 0, 10, 10)
     Public SpriteTexture As Texture2D
 
-
     Public Sub New()
 
     End Sub
 
     Public Sub Draw(theSpriteBatch As SpriteBatch)
-        DrawRectangle.Draw(theSpriteBatch, rect, Color.Red)
+        'DrawRectangle.Draw(theSpriteBatch, rect, Color.Red) ' Draw Bounding Box
         theSpriteBatch.Draw(SpriteTexture, New Rectangle(rect.X, rect.Y - SpriteTexture.Height + rect.Height, SpriteTexture.Width, SpriteTexture.Height), Color.White)
-        rect.Width = SpriteTexture.Width
+        rect.Width = SpriteTexture.Width - 6
     End Sub
 
     Public Sub Update(gameTime As GameTime)
         If Keyboard.GetState.IsKeyDown(Keys.W) Then
             For Each Block In TileEngine.Blocks
-                If Block.rect.Intersects(New Rectangle(rect.X, rect.Y - 1, rect.Width, rect.Height)) Then
+                If Block.BoundingBox.Intersects(New Rectangle(rect.X, rect.Y - 1, rect.Width, rect.Height)) AndAlso Block.Solid = True Then
                     Return
                 End If
             Next
@@ -30,7 +29,7 @@ Public Class Character
 
         If Keyboard.GetState.IsKeyDown(Keys.A) Then
             For Each Block In TileEngine.Blocks
-                If Block.rect.Intersects(New Rectangle(rect.X - 1, rect.Y, rect.Width, rect.Height)) Then
+                If Block.BoundingBox.Intersects(New Rectangle(rect.X - 1, rect.Y, rect.Width, rect.Height)) AndAlso Block.Solid = True Then
                     Return
                 End If
             Next
@@ -40,7 +39,7 @@ Public Class Character
 
         If Keyboard.GetState.IsKeyDown(Keys.S) Then
             For Each Block In TileEngine.Blocks
-                If Block.rect.Intersects(New Rectangle(rect.X, rect.Y + 1, rect.Width, rect.Height)) Then
+                If Block.BoundingBox.Intersects(New Rectangle(rect.X, rect.Y + 1, rect.Width, rect.Height)) AndAlso Block.Solid = True Then
                     Return
                 End If
             Next
@@ -50,7 +49,7 @@ Public Class Character
 
         If Keyboard.GetState.IsKeyDown(Keys.D) Then
             For Each Block In TileEngine.Blocks
-                If Block.rect.Intersects(New Rectangle(rect.X + 1, rect.Y, rect.Width, rect.Height)) Then
+                If Block.BoundingBox.Intersects(New Rectangle(rect.X + 1, rect.Y, rect.Width, rect.Height)) AndAlso Block.Solid = True Then
                     Return
                 End If
             Next

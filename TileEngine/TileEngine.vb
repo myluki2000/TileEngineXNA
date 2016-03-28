@@ -20,6 +20,8 @@ Public Class TileEngine
 
     Public Player As New Character
 
+    Public Shared ShadowTexture As Texture2D
+
     Public Sub New()
         MyBase.New()
         graphics = New GraphicsDeviceManager(Me)
@@ -52,15 +54,20 @@ Public Class TileEngine
         ' Create a new SpriteBatch, which can be used to draw textures.
         spriteBatch = New SpriteBatch(GraphicsDevice)
 
+        ShadowTexture = Content.Load(Of Texture2D)("shadow")
+
+        Block.BlockWidth = 70
+
+        Blocks.Add(New Block(New Vector2(0, 0)))
+        Blocks.Add(New Block(New Vector2(1, 0)))
+        Blocks.Add(New Block(New Vector2(2, 0)))
+        Blocks.Add(New Block(New Vector2(3, 0)))
+        Blocks.Add(New Block(New Vector2(3, 1)))
+        Blocks.Add(New Block(New Vector2(3, 2), True, Content.Load(Of Texture2D)("wood"), True))
+        Blocks.Add(New Block(New Vector2(2, 2), True, Content.Load(Of Texture2D)("tree"),
+          New Rectangle(CInt(0.25 * Block.BlockWidth), CInt(0.7 * Block.BlockWidth), CInt(-0.5 * Block.BlockWidth), CInt(-0.7 * Block.BlockWidth)), True))
 
 
-        'Blocks.Add(New Block(New Vector2(0, 0)))
-        'Blocks.Add(New Block(New Vector2(1, 0)))
-        'Blocks.Add(New Block(New Vector2(2, 0)))
-        'Blocks.Add(New Block(New Vector2(3, 0)))
-        'Blocks.Add(New Block(New Vector2(3, 1)))
-        'Blocks.Add(New Block(New Vector2(3, 2)))
-        Blocks.Add(New Block(New Vector2(2, 2), True, Content.Load(Of Texture2D)("tree"), New Rectangle(25, 70, -50, -70)))
 
 
         Player.SpriteTexture = Content.Load(Of Texture2D)("character")

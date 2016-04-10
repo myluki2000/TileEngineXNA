@@ -68,7 +68,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Block.vb" />
-    <Compile Include="Character.vb" />
+    <Compile Include="Character\Character.vb" />
+    <Compile Include="Character\Movement.vb" />
     <Compile Include="DrawRectangle.vb" />
     <Compile Include="GlobalVariables.vb" />
     <Compile Include="Tile.vb" />
@@ -91,6 +92,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\shadow.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\stone_broken.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\tree.png">

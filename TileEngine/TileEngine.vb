@@ -14,12 +14,15 @@ Public Class TileEngine
     Inherits Game
     Public Shared graphics As GraphicsDeviceManager
     Private spriteBatch As SpriteBatch
-    Dim renderTarget As RenderTarget2D
+    Dim shadowTarget As RenderTarget2D
 
-    Public Shared Blocks As New List(Of Block)
+    Public Shared Blocks As New List(Of Block) ' Blocks layer 1
+
     Public Shared Tiles As New List(Of Tile)
 
     Public Player As New Character
+
+    Public grassTexture As Texture2D
 
     Public Shared ShadowTexture As Texture2D
 
@@ -38,12 +41,10 @@ Public Class TileEngine
     Protected Overrides Sub Initialize()
         ' TODO: Add your initialization logic here
 
-        renderTarget = New RenderTarget2D(GraphicsDevice, GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight)
+        shadowTarget = New RenderTarget2D(GraphicsDevice, GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight)
 
 
-
-
-        Player.rect.Location = New Vector2(500, 300).ToPoint
+        Player.rect.Location = New Point(180, 180)
         MyBase.Initialize()
     End Sub
 
@@ -59,19 +60,27 @@ Public Class TileEngine
 
         Block.BlockWidth = 70
 
-        Blocks.Add(New Block(New Vector2(0, 0)))
-        Blocks.Add(New Block(New Vector2(1, 0)))
-        Blocks.Add(New Block(New Vector2(2, 0)))
-        Blocks.Add(New Block(New Vector2(3, 0)))
-        Blocks.Add(New Block(New Vector2(3, 1)))
-        Blocks.Add(New Block(New Vector2(3, 2), True, Content.Load(Of Texture2D)("wood"), True))
-        Blocks.Add(New Block(New Vector2(2, 2), True, Content.Load(Of Texture2D)("tree"),
+        Blocks.Add(New Block(New Vector3(0, 0, 0)))
+
+
+
+        Blocks.Add(New Block(New Vector3(1, 0, 0)))
+        Blocks.Add(New Block(New Vector3(2, 0, 0), True, Content.Load(Of Texture2D)("stone_broken"), True))
+        Blocks.Add(New Block(New Vector3(3, 0, 0), True, Content.Load(Of Texture2D)("stone_broken"), True))
+        Blocks.Add(New Block(New Vector3(3, 1, 0), True, Content.Load(Of Texture2D)("stone_broken"), True))
+        Blocks.Add(New Block(New Vector3(3, 2, 0), True, Content.Load(Of Texture2D)("wood"), True))
+        Blocks.Add(New Block(New Vector3(2, 2, 0), True, Content.Load(Of Texture2D)("tree"),
           New Rectangle(CInt(0.25 * Block.BlockWidth), CInt(0.7 * Block.BlockWidth), CInt(-0.5 * Block.BlockWidth), CInt(-0.7 * Block.BlockWidth)), True))
+
+
+        Blocks.Add(New Block(New Vector3(0, 0, 1)))
 
 
         Tile.TileWidth = 70
 
-        Tiles.Add(New Tile(New Vector2(0, 2), Content.Load(Of Texture2D)("grass")))
+        grassTexture = Content.Load(Of Texture2D)("grass")
+
+        Tiles.Add(New Tile(New Vector2(0, 2), grassTexture))
 
 
 
@@ -108,13 +117,15 @@ Public Class TileEngine
     ''' <param name="gameTime">Provides a snapshot of timing values.</param>
     Protected Overrides Sub Draw(gameTime As GameTime)
 
-
-        spriteBatch.Begin(Nothing, BlendState.AlphaBlend, Nothing, Nothing, Nothing, Nothing, Nothing)
-
-
         graphics.GraphicsDevice.SetRenderTarget(Nothing)
         GraphicsDevice.Clear(Color.CornflowerBlue)
 
+        spriteBatch.Begin(Nothing, BlendState.AlphaBlend, SamplerState.LinearWrap, Nothing, Nothing, Nothing, Nothing)
+        ' Draw default floor tile
+        spriteBatch.Draw(grassTexture, New Vector2(0, 0), New Rectangle(0, 0, 100000, 50000), Color.White)
+        spriteBatch.End()
+
+        spriteBatch.Begin(Nothing, BlendState.AlphaBlend, Nothing, Nothing, Nothing, Nothing, Nothing)
         ' Draw floor tiles
         For Each Tile In Tiles
             Tile.Draw(spriteBatch)
@@ -122,30 +133,43 @@ Public Class TileEngine
 
 
         ' Draw render target with shadows
-        spriteBatch.Draw(renderTarget, New Vector2(0, 0), Color.Black * 0.3F)
+        spriteBatch.Draw(shadowTarget, New Vector2(0, 0), Color.Black * 0.3F)
 
 
         ' Draw blocks behind player
         For Each Block In Blocks
-            If Block.rect.Y + Block.BlockWidth <= Player.rect.Y Then
+            If Block.Position.Z < Character.PositionZ OrElse Block.rect.Y + Block.BlockWidth <= Player.rect.Y Then
                 Block.Draw(spriteBatch)
             End If
         Next
+
+
+
+        For Each Block In TileEngine.Blocks
+            If Block.Position.Z = Character.PositionZ - 1 Then
+                DrawRectangle.Draw(spriteBatch, New Rectangle(Block.rect.X, Block.rect.Y - Block.BlockWidth, Block.rect.Width, Block.rect.Height), Color.Red)
+            End If
+        Next
+
+
+
 
         ' Draw player
         Player.Draw(spriteBatch)
 
         ' Draw blocks in front of player
         For Each Block In Blocks
-            If Block.rect.Y + Block.BlockWidth > Player.rect.Y Then
+            If Not Block.Position.Z < Character.PositionZ AndAlso Block.rect.Y + Block.BlockWidth > Player.rect.Y Then
                 Block.Draw(spriteBatch)
             End If
         Next
+
+
         spriteBatch.End()
 
         If gameTime.TotalGameTime.TotalSeconds < 5 Then
             ' Draw shadows which will be saved to a render target
-            graphics.GraphicsDevice.SetRenderTarget(renderTarget)
+            graphics.GraphicsDevice.SetRenderTarget(shadowTarget)
             GraphicsDevice.Clear(Color.Transparent)
             spriteBatch.Begin()
             For Each Block In Blocks
